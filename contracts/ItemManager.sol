@@ -2,9 +2,11 @@
 
 pragma solidity ^0.8.7;
 
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+
 import "./Item.sol";
 
-contract ItemManager {
+contract ItemManager is Ownable {
     enum SupplyChainState {
         Created,
         Paid,
@@ -27,7 +29,10 @@ contract ItemManager {
         address _itemAddress
     );
 
-    function createItem(string memory _identifier, uint256 _itemPrice) public {
+    function createItem(string memory _identifier, uint256 _itemPrice)
+        public
+        onlyOwner
+    {
         Item item = new Item(this, _itemPrice, itemIndex);
         items[itemIndex]._item = item;
         items[itemIndex]._identifier = _identifier;
@@ -59,7 +64,7 @@ contract ItemManager {
         );
     }
 
-    function triggerDelivery(uint256 _itemIndex) public {
+    function triggerDelivery(uint256 _itemIndex) public onlyOwner {
         require(
             items[_itemIndex]._state == SupplyChainState.Paid,
             "Item is further in the chain!!"
